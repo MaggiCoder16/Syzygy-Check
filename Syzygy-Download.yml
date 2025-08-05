@@ -1,0 +1,44 @@
+name: Download Syzygy Tablebases
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download-syzygy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create engines/syzygy directories
+        run: |
+          mkdir -p engines/syzygy/wdl
+          mkdir -p engines/syzygy/dtz
+
+      - name: Download and extract WDL (3-5 pieces)
+        run: |
+          for pieces in 3 4 5; do
+            url="https://tablebase.lichess.ovh/tables/wdl/${pieces}-men.zip"
+            echo "Downloading $url"
+            curl -L "$url" -o "wdl-${pieces}-men.zip"
+            unzip -q "wdl-${pieces}-men.zip" -d engines/syzygy/wdl
+            rm "wdl-${pieces}-men.zip"
+          done
+
+      - name: Download and extract DTZ (3-5 pieces)
+        run: |
+          for pieces in 3 4 5; do
+            url="https://tablebase.lichess.ovh/tables/dtz/${pieces}-men.zip"
+            echo "Downloading $url"
+            curl -L "$url" -o "dtz-${pieces}-men.zip"
+            unzip -q "dtz-${pieces}-men.zip" -d engines/syzygy/dtz
+            rm "dtz-${pieces}-men.zip"
+          done
+
+      - name: List downloaded files
+        run: |
+          echo "WDL:"
+          ls engines/syzygy/wdl | wc -l
+          echo "DTZ:"
+          ls engines/syzygy/dtz | wc -l
